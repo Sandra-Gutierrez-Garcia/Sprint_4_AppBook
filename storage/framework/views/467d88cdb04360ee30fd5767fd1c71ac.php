@@ -65,6 +65,10 @@
                 Writer: <?php echo e($book->writer->name); ?>
 
                 </p>
+                <a href="<?php echo e(route('book.show', ['book' => $book->idbook])); ?>" 
+                  class="inline-block mt-2 px-4 py-2  rounded hover:bg-orange-300 h-10">
+                  Read
+                </a>
             </div>
           </div>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

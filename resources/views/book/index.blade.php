@@ -63,6 +63,10 @@
                 <p class="text-gray-700 text-left">
                 Writer: {{ $book->writer->name }}
                 </p>
+                <a href="{{ route('book.show', ['book' => $book->idbook]) }}" 
+                  class="inline-block mt-2 px-4 py-2  rounded hover:bg-orange-300 h-10">
+                  Read
+                </a>
             </div>
           </div>
         @endforeach
