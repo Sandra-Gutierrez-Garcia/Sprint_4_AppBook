@@ -27,13 +27,14 @@ class BookRequest extends FormRequest
             'publish_date' => 'nullable|date',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
             'content' => 'required|string|min:10',
-            
-            // para que comprobe que el minimo haya un genero implenatado
-            'genres' => 'array',
-            'gneres.*' => 'exists:genre,idgenre'
-           
-            
-
         ];
+         if ($this->isMethod('POST')) {
+        $rules['genres'] = 'required|array|min:1';
+        $rules['genres.*'] = 'required|integer|exists:genre,idgenre';
+        } 
+        else {
+            $rules['genres'] = 'sometimes|array';
+            $rules['genres.*'] = 'integer|exists:genre,idgenre';
+        }
     }
 }

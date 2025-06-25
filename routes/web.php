@@ -11,6 +11,8 @@ use App\Models\Gnere;
 Route::get('/writer/login', [WriterController::class, 'loginWriter'])->name('writer.login');
 Route::post('/writer/login/process', [WriterController::class, 'logeandoWriter'])->name('writer.login.process');
 Route::post('/writer/logout',[WriterController:: class, 'exitWriter'])->name('writer.logout');
+Route::get('/book/filter', [BookController::class, 'filterGener'])->name('book.filter');
+
 // Rutas resource
 Route::resource('writer', WriterController::class);
 Route::resource('book', BookController::class);

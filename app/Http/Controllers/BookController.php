@@ -30,7 +30,8 @@ class BookController extends Controller
         //
         $books = Book::all();// Obtener todos los libros
         $genres_book= Genres_book::all();// obtener sus generos
-        return view('book.index', ['books' => $books],["genres_book"=>$genres_book]);
+        $genres = Genre::all(); 
+        return view('book.index', ['books' => $books, "genres_book"=>$genres_book, 'genres' => $genres]);
         
     }
 
@@ -54,41 +55,42 @@ class BookController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(BookRequest $request)
+     public function store(BookRequest $request)
     {
         
-    try {
-        
-        //Obtener el writer de la sesión
-        $writer = session('writer');
-        
-        if (!$writer) {
-            return redirect()->route('writer.login')
-                ->with('error', 'Please login first to create a book');
-        }
+        try {
+            
+            //Obtener el writer de la sesión
+            $writer = session('writer');
+            
+            if (!$writer) {
+                return redirect()->route('writer.login')
+                    ->with('error', 'Please login first to create a book');
+            }
 
-        // Validar los datos
-        $validated = $request->validated();
-        
-        // Agregar el idwriter al array de datos validados
-        $validated['idwriter'] = $writer->idwriter;
-        $validated['publish_date']= now();
+            // Validar los datos
+            $validated = $request->validated();
+            
+            // Agregar el idwriter al array de datos validados
+            $validated['idwriter'] = $writer->idwriter;
+            $validated['publish_date']= now();
 
 
-        // Procesar la imagen si existe
-        if ($request->hasFile('photo')) {
-            $imagePath = $request->file('photo')->store('books', 'public');
-            $validated['photo'] = $imagePath;
-        }
-          
-         // Crear el libro
-        $book = Book::create($validated);
-//guardar los generos
-        if ($request->has('genres')) {
-            $book->genres()->sync($request->genres); // Usar sync en lugar de attach
-        }
+            // Procesar la imagen si existe
+            if ($request->hasFile('photo')) {
+                $imagePath = $request->file('photo')->store('books', 'public');
+                $validated['photo'] = $imagePath;
+            }
+            
+            // Crear el libro
+            $book = Book::create($validated);
+           
+            //guardar los generos
+            if ($request->has('genres')) {
+                $book->genres()->sync($request->genres); // Usar sync en lugar de attach
+            }
        
-         // dd($book->genres);
+            //dd($book->genres);
 
        
             error_log("funciona si, se creado correctamnete");
@@ -96,12 +98,12 @@ class BookController extends Controller
             return redirect()->route('writer.show', ['writer' => $writer])
             ->with('Delete book');
 
-    } catch (\Exception $e) {
-            error_log("❌ Error al crear libro: " . $e->getMessage() . " en línea " . $e->getLine());
+            } catch (\Exception $e) {
+                    error_log("❌ Error al crear libro: " . $e->getMessage() . " en línea " . $e->getLine());
 
-        return back()
-            ->withInput();
-    }
+                return back()
+                    ->withInput();
+            }
 
     }
 
@@ -143,6 +145,7 @@ class BookController extends Controller
             $imagePath = $request->file('photo')->store('books', 'public');
             $validated['photo'] = $imagePath;
         }
+        
         $book->update($validated);
         $writer = $book->idwriter;
         return redirect()->route('writer.show', ['writer' => $writer])
@@ -168,5 +171,24 @@ class BookController extends Controller
         $writer = $book->idwriter;
         return redirect()->route('writer.show', ['writer' => $writer])
         ->with('Delete book');
+    }
+
+    public function filterGener(Request $request){
+        
+        $genres = Genre::all(); 
+        $selectedGenres = $request->input('genres', []);
+        //solo busque esa informacion
+        $query = Book::with(['writer', 'genres']);
+        //si ha escogido algun genero activa al if
+       if (!empty($selectedGenres)) {
+        $query->whereHas('genres', function($q) use ($selectedGenres) {
+            $q->whereIn('genre.idgenre', $selectedGenres);
+        });
+
+    }
+        $books = $query->get();    
+        return view('book.index', ['books' => $books,'genres' => $genres, 'selectedGenres' => $selectedGenres]);        
+    
+    
     }
 }

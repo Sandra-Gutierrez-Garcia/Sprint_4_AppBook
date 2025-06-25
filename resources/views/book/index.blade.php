@@ -33,18 +33,31 @@
     </div>
   </nav>
   <main class="mx-8">
-    <div class="border-2 border-gray-300 my-6 py-8 text-center text-black text-2xl font-bold">
+     <!-- Filtar por generos-->
+    <div class="p-6 flex justify-center ">
+      <form action="{{ route('book.filter') }}" method="GET" class="bg-white p-6 rounded">
+        <label class="block text-gray-700 mb-2 text-center">Filter Genre</label>
+        <div class="space-x-4">
+            @foreach($genres as $genre)
+            <label class="inline-flex items-center">
+                <input type="checkbox" name="genres[]" value="{{ $genre->idgenre }}" class="form-checkbox">
+                <span class="ml-1">{{ $genre->namegenre }}</span>
+            </label>
+            @endforeach
+          <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Filtrar</button>
+        </div>
+         </form>
+
+    </div>
+    <div class=" border-2 border-gray-300 my-6 py-8 text-center flex justify-center text-black text-2xl font-bold">
       Bienvenido a la aplicación de libros
     </div>
     <div>
       <h1 class="text-lg font-medium text-gray-600 mb-3">
         BOOK
       </h1>  
-       <div>
-      <h1 class="text-lg font-medium text-gray-600 mb-3">
-        Writer
-      </h1>  
-      <div class="flex gap-4">
+      <div>
+      <div class="p-6 flex gap-4">
         @foreach($books as $book)
           <div class="w-64 h-s rounded-lg flex flex-col items-center justify-center shadow-md shadow-gray-400 bg-white">
             <div class="relative w-32 h-32 overflow-hidden  border-2 border-gray-300 bg-gray-100 flex items-center justify-center">
